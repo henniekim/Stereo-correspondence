@@ -1,11 +1,12 @@
 
 import numpy as np
-from skimage.filter import gaussian_filter
-from skimage.filter.rank import gradient
+from skimage.filters import gaussian
+from skimage.filters.rank import gradient
 from skimage.io import imread
 from skimage.viewer import ImageViewer
 from skimage import color
-from skimage.filter import canny, hsobel, vsobel
+from skimage.filters import sobel_h, sobel_v
+from skimage.feature import canny
 
 '''
 Filtering:
@@ -13,7 +14,7 @@ Filtering:
 
 #Define a function to blur an image:
 def blur(img, sigma=1.41):
-    return gaussian_filter(img, sigma)
+    return gaussian(img, sigma)
 
 '''
 Sampling:
@@ -57,7 +58,7 @@ def down_pyramid(image, levels=4, sample_rate=2):
     pyramid = [image]
 
     #Iteratively construct the pyramid:
-    for _ in xrange(levels-1):
+    for _ in range(levels-1):
         image = downsample(image, sample_rate=sample_rate)
         pyramid.append(image)
 
@@ -69,7 +70,7 @@ def up_pyramid(image, levels=4, sample_rate=2, desired_sizes=None):
     pyramid = [image]
 
     #Iteratively construct the pyramid:
-    for i in xrange(1,levels):
+    for i in range(1,levels):
         if desired_sizes is not None:
             ds = desired_sizes[i]
         else:
@@ -88,8 +89,8 @@ if __name__ == '__main__':
     img2 = color.rgb2gray(img)
 
     pyram = down_pyramid(img2, sample_rate=2)
-    print [p.shape for p in pyram]
-    print [p.shape for p in pyram[::-1]]
+    print ([p.shape for p in pyram])
+    print ([p.shape for p in pyram[::-1]])
 
     pyram = up_pyramid(pyram[-1], sample_rate=2, desired_sizes=[p.shape for p in pyram[::-1]])
-    print [p.shape for p in pyram]
+    print ([p.shape for p in pyram])

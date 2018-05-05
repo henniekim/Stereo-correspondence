@@ -5,7 +5,8 @@ Imports:
 import Pyramids
 import numpy as np
 import Helper
-from skimage.filter import hsobel, vsobel,canny
+from skimage.filters import sobel_h, sobel_v
+from skimage.feature import canny
 from skimage.io import imread
 from skimage.viewer import ImageViewer
 from skimage import color,img_as_ubyte
@@ -19,14 +20,14 @@ Feature extraction:
 
 #Define a method to extract a gradient map from an image:
 def gradient_map(image):
-    h = hsobel(image)
-    v = vsobel(image)
+    h = sobel_h(image)
+    v = sobel_v(image)
     return np.dstack((h,v))
 
 #Define a method to extract a gradient orientation map from an image:
 def gradient_orientation_map(image):
-    h = hsobel(image)
-    v = vsobel(image)
+    h = sobel_h(image)
+    v = sobel_v(image)
     return np.arctan2(h,v)
 
 #Define a method to extract an edge map from an image:
@@ -54,15 +55,15 @@ def gradient_match_wrapper(image1, image2,search_radius = 40):
     values = np.empty(shape=s,dtype=int)
 
     #Iterate through the image:
-    for x in xrange(search_radius, len(padded_left_edges)-search_radius):
-        for y in xrange(search_radius, len(padded_left_edges[0])-search_radius):
+    for x in range(search_radius, len(padded_left_edges)-search_radius):
+        for y in range(search_radius, len(padded_left_edges[0])-search_radius):
 
             #Check if there is an edge:
             if padded_left_edges[x,y]:
                 best_similarity = -1
                 #Iterate through the window to see if there are other edges:
-                for i in xrange(-search_radius, search_radius):
-                    for j in xrange(-search_radius, search_radius):
+                for i in range(-search_radius, search_radius):
+                    for j in range(-search_radius, search_radius):
                         if padded_right_edges[x+i,y+j]:
                             g1 = left_gradients[x-search_radius,y-search_radius]
                             g2 = right_gradients[x-search_radius+i,y-search_radius+j]
@@ -94,15 +95,15 @@ def match(left_edges, left_gradients, right_edges, right_gradients, search_radiu
     values = np.zeros_like(left_edges, dtype=np.float)
 
     #Iterate through the image:
-    for x in xrange(search_radius, len(padded_left_edges)-search_radius):
-        for y in xrange(search_radius, len(padded_left_edges[0])-search_radius):
+    for x in range(search_radius, len(padded_left_edges)-search_radius):
+        for y in range(search_radius, len(padded_left_edges[0])-search_radius):
 
             #Check if there is an edge:
             if padded_left_edges[x,y]:
                 best_similarity = -1
                 #Iterate through the window to see if there are other edges:
-                for i in xrange(-search_radius, search_radius):
-                    for j in xrange(-search_radius, search_radius):
+                for i in range(-search_radius, search_radius):
+                    for j in range(-search_radius, search_radius):
                         if padded_right_edges[x+i,y+j]:
                             g1 = left_gradients[x-search_radius,y-search_radius]
                             g2 = right_gradients[x-search_radius+i,y-search_radius+j]
@@ -141,7 +142,7 @@ def analyse(left_image, right_image, pyramid_levels=4, search_radius = 10, maxit
     right_gradients = [None]*pyramid_levels
 
     #Do the calculation:
-    for i in xrange(pyramid_levels):
+    for i in range(pyramid_levels):
         left_edges[i] = edge_map(left_pyramid[i])
         right_edges[i] = edge_map(right_pyramid[i])
         left_gradients[i] = gradient_map(left_pyramid[i])
@@ -153,7 +154,7 @@ def analyse(left_image, right_image, pyramid_levels=4, search_radius = 10, maxit
     result_matrices[-1] = np.zeros_like(left_edges[-1], dtype=np.float)
 
     #Run through the layers, interpolating from the previous:
-    for i in reversed(xrange(pyramid_levels)):
+    for i in reversed(range(pyramid_levels)):
         (points, values) = match(left_edges[i], left_gradients[i], right_edges[i], right_gradients[i], search_radius)
         result_matrices[i] = Helper.interp(result_matrices[i], points, values, maxitt, l)
 
@@ -185,14 +186,14 @@ def build_match_dic(image1, image2, matching_algorithm):
 
     p,v = matching_algorithm(image1, image2)
 
-    print image1.shape
-    print image2.shape
-    print p.shape
-    print v.shape
+    print (image1.shape)
+    print (image2.shape)
+    print (p.shape)
+    print (v.shape)
 
-    print "Converting to dictionary..."
-    for x in xrange(p.shape[0]):
-        for y in xrange(p.shape[1]):
+    print ("Converting to dictionary...")
+    for x in range(p.shape[0]):
+        for y in range(p.shape[1]):
             if p[x,y]:
                 d[(x,y)] = v[x,y]
 
@@ -201,10 +202,10 @@ def build_match_dic(image1, image2, matching_algorithm):
 
 #Define a method to produce an evaluation of the matching strategy:
 def show_matching(img, img2, matching):
-    print "matching..."
+    print ("matching...")
     ip_match = build_match_dic(img, img2, matching)
 
-    print "Constructing intermediate image..."
+    print ("Constructing intermediate image...")
     padding = 5 #padding around the edges
 
     bar = np.ndarray((img.shape[0], 5))
@@ -225,7 +226,7 @@ def show_matching(img, img2, matching):
 
     viewer = ImageViewer(img3)
     viewer.show()
-    print "Drawing lines..."
+    print ("Drawing lines...")
 
     colimg = color.gray2rgb(img3)
     for k,v in random.sample(ip_match.items(), int(float(len(ip_match.keys()))*0.005)):
@@ -262,7 +263,7 @@ if __name__ == "__main__":
     rimg = imread(fname2)
     rimg2 = color.rgb2gray(rimg)
 
-    print "Both images have been succesfully loaded. Analysing..."
+    print ("Both images have been succesfully loaded. Analysing...")
 
     img3 = analyse(limg2, rimg2, pyramid_levels=4,maxitt=500,l=400)
 

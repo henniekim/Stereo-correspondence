@@ -60,9 +60,9 @@ def testinterp(noiselevel, pointfrac):
     values = np.multiply((1*points), Data)
     start = startval*np.ones((dimx,dimy))
 
-    print "Interpolating..."
+    print ("Interpolating...")
     Ipim = interp(start, points, values, maxitt, l)
-    print "Done!"
+    print ("Done!")
 
     # compare and display result
 
@@ -71,7 +71,7 @@ def testinterp(noiselevel, pointfrac):
     errsq = err1.dot(err1)
 
     rms= math.sqrt(errsq.sum())/float(dimx*dimy)
-    print 'average reconstruction error:', rms
+    print ('average reconstruction error:', rms)
 
     shGT = GT - GT.min()
     shGT = shGT/float(shGT.max())
@@ -83,20 +83,20 @@ def testinterp(noiselevel, pointfrac):
     #h = figure(1);
     #subplot(2,2,1);
 
-    print "ground truth"
+    print ("ground truth")
     view = ImageViewer(shGT)
     view.show()
 
-    print 'Reconstruction'
+    print ('Reconstruction')
     view = ImageViewer(shIp)
     view.show()
 
 
-    print 'Sparse point position'
+    print ('Sparse point position')
     view = ImageViewer(points)
     view.show()
 
-    print 'Reconstruction error'
+    print ('Reconstruction error')
     view = ImageViewer(sher)
     view.show()
 
