@@ -13,7 +13,7 @@ Filtering:
 '''
 
 #Define a function to blur an image:
-def blur(img, sigma=1.41):
+def blur(img, sigma=5):
     return gaussian(img, sigma)
 
 '''

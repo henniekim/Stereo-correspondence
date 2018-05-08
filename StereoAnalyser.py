@@ -265,6 +265,7 @@ if __name__ == "__main__":
 
     print ("Both images have been succesfully loaded. Analysing...")
 
-    img3 = analyse(limg2, rimg2, pyramid_levels=4,maxitt=500,l=400)
+    img3 = analyse(limg2, rimg2, pyramid_levels=4,maxitt=500, l=400)
 
     show_disparity_map(img3)
+    show_matching(limg2, rimg2, gradient_match_wrapper)
